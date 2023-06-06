@@ -1,0 +1,25 @@
+version: 1
+
+packages:
+  - path: "./../internal/dao"
+    name: "dao"
+    engine: "mysql"
+    schema: "./../internal/sql/"
+    queries: "./../internal/sql/"
+    emit_empty_slices: true
+    emit_result_struct_pointers: true
+    emit_params_struct_pointers: true
+    emit_pointers_for_null_types: true
+    emit_enum_valid_method: true
+    emit_all_enum_values: true
+    query_parameter_limit: 2
+    #    emit_prepared_queries: true
+    emit_interface: true
+
+overrides:
+  - go_type: "github.com/shopspring/decimal.Decimal"
+    db_type: "decimal"
+  - db_type: bigint
+    go_type: uint64
+  - db_type: int
+    go_type: uint32

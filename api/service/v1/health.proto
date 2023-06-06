@@ -1,0 +1,27 @@
+syntax = "proto3";
+package api.service.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/night-sword/kratos-layout/api/service/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.service.v1";
+
+enum Status {
+    UP = 0;
+    DOWN = 1;
+}
+
+message HealthRequest {
+    string service = 1;
+}
+message HealthReply {
+    Status status = 1;
+}
+service Health {
+    rpc HealthCheck (HealthRequest) returns (HealthReply)  {
+        option (google.api.http) = {
+            get: "/health",
+        };
+    }
+}
