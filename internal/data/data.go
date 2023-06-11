@@ -11,6 +11,7 @@ import (
 	googlegrpc "google.golang.org/grpc"
 
 	"github.com/night-sword/kratos-layout/internal/conf"
+	"github.com/night-sword/kratos-layout/internal/dao"
 )
 
 type Data struct {
@@ -24,6 +25,19 @@ func NewData(config *conf.Data) (data *Data, cleanup func(), err error) {
 	data = &Data{}
 
 	return
+}
+
+func newDB(conf *conf.Data) (db *sql.DB) {
+	db, err := sql.Open(conf.Database.GetDriver(), conf.Database.GetSource())
+	if err != nil {
+		panic(err)
+	}
+
+	return
+}
+
+func newDao(db *sql.DB) (querys *dao.Queries) {
+	return dao.New(db)
 }
 
 func newDemoGrpcClient(config *conf.Data_DemoGrpc) (client googlegrpc.ClientConnInterface) {
