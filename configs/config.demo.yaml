@@ -5,11 +5,18 @@ server:
   grpc:
     addr: 0.0.0.0:9000
     timeout: 1s
+
 data:
+  log:
+    level: info # debug info warn error
   database:
     driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test
+    source: root:root@tcp(127.0.0.1:3306)/test?parseTime=true&loc=Local&charset=utf8mb4
   redis:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
+  registrar:
+    endpoints: [ "127.0.0.1:2379" ] # with etcd
+
+business:

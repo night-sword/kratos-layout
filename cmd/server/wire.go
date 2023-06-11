@@ -7,6 +7,7 @@ package main
 
 import (
 	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 
@@ -18,8 +19,8 @@ import (
 
 func wireApp(
 	cmd.Name, cmd.Version,
-	log.Logger,
-	*conf.Server, *conf.Data, *conf.Business,
+	log.Logger, config.Config,
+	*conf.Bootstrap, *conf.Server, *conf.Data, *conf.Business,
 ) (*kratos.App, func(), error) {
 	panic(
 		wire.Build(

@@ -1,21 +1,20 @@
 package server
 
 import (
-	"github.com/go-kratos/kratos/v2/middleware/validate"
-
-	v1 "github.com/night-sword/kratos-layout/api/service/v1"
-	"github.com/night-sword/kratos-layout/internal/conf"
-	"github.com/night-sword/kratos-layout/internal/service"
-
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
+	"github.com/night-sword/kratos-kit/log"
+	"github.com/night-sword/kratos-kit/middleware"
+
+	"github.com/night-sword/kratos-layout/internal/conf"
 )
 
-func NewGRPCServer(c *conf.Server, health *service.HealthService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
+			middleware.LogServer(log.GetLogger()),
 			validate.Validator(),
 		),
 	}
@@ -29,7 +28,6 @@ func NewGRPCServer(c *conf.Server, health *service.HealthService, logger log.Log
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	v1.RegisterHealthServer(srv, health)
 
 	return srv
 }

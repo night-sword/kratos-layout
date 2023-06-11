@@ -27,6 +27,9 @@ message Server {
 }
 
 message Data {
+    message Log {
+        string level = 1;
+    }
     message Database {
         string driver = 1;
         string source = 2;
@@ -37,12 +40,18 @@ message Data {
         google.protobuf.Duration read_timeout = 3;
         google.protobuf.Duration write_timeout = 4;
     }
+    message Registrar {
+        repeated string endpoints = 1;
+    }
     message DemoGrpc {
         string addr = 1;
     }
-    Database database = 1;
-    Redis redis = 2;
-    DemoGrpc demoGrpc = 3;
+
+    Log log = 1;
+    Database database = 2;
+    Redis redis = 3;
+    Registrar registrar = 4;
+    DemoGrpc demoGrpc = 5;
 }
 
 message Business {
