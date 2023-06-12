@@ -37,12 +37,17 @@ message Data {
         google.protobuf.Duration read_timeout = 3;
         google.protobuf.Duration write_timeout = 4;
     }
+    message Registrar {
+        repeated string endpoints = 1;
+    }
     message DemoGrpc {
         string addr = 1;
     }
+
     Database database = 1;
     Redis redis = 2;
-    DemoGrpc demoGrpc = 3;
+    Registrar registrar = 3;
+    DemoGrpc demoGrpc = 4;
 }
 
 message Business {

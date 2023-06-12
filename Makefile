@@ -1,6 +1,7 @@
 GOHOSTOS:=$(shell go env GOHOSTOS)
 GOPATH:=$(shell go env GOPATH)
 VERSION=$(shell git describe --tags --always)
+NAME=layout # need modify to your projcet name, this will set as service name
 
 ifeq ($(GOHOSTOS), windows)
 	#the `find.exe` is different from `find` in bash/shell.
@@ -92,12 +93,12 @@ brun: all
 
 .PHONY: build
 build:
-	mkdir -p bin/ && go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/ ./...
+	mkdir -p bin/ && go build -trimpath -ldflags "-X main.Version=$(VERSION) -X main.Name=$(NAME)" -o ./bin/ ./...
 
 .PHONY: release
 release:
 	rm -f ./release/*
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-X main.Version=$(VERSION)" -o ./release/ ./... 
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-X main.Version=$(VERSION) -X main.Name=$(NAME)" -o ./release/ ./... 
 	cp ./configs/config.yaml ./release/config.yaml
 	zip -r ./release/release-$(shell date +%s).zip ./release/
 

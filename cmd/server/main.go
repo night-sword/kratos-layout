@@ -22,14 +22,16 @@ var (
 
 func main() {
 	flag.Parse()
-	configs := cmd.Bootstrap()
+	config := cmd.Config()
+	bootstrap := cmd.Bootstrap(config)
 	name, version := cmd.Name(Name), cmd.Version(Version)
 	logger := cmd.Logger(version)
 	log.SetLogger(logger) // set default logger
 
 	app, cleanup, err := wireApp(
-		name, version, logger,
-		configs.Server, configs.Data, configs.Business,
+		name, version,
+		logger, config,
+		&bootstrap, bootstrap.Server, bootstrap.Data, bootstrap.Business,
 	)
 	if err != nil {
 		panic(err)

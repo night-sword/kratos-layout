@@ -8,6 +8,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 
 	"github.com/night-sword/kratos-layout/internal/conf"
+	"github.com/night-sword/kratos-layout/internal/middleware"
 )
 
 func NewGRPCServer(
@@ -16,6 +17,7 @@ func NewGRPCServer(
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
+			middleware.LogServer(log.GetLogger()),
 			validate.Validator(),
 		),
 	}
