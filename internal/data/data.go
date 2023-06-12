@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/night-sword/kratos-kit/log"
 	googlegrpc "google.golang.org/grpc"
 
 	"github.com/night-sword/kratos-layout/internal/conf"
@@ -20,7 +21,10 @@ type Data struct {
 }
 
 func NewData(config *conf.Data) (data *Data, cleanup func(), err error) {
-	cleanup = func() { log.Info("closing the data resources") }
+	cleanup = func() {
+		// TODO: close resources
+		log.Info("closing the data resources")
+	}
 
 	data = &Data{}
 

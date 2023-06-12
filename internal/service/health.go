@@ -14,7 +14,7 @@ func NewHealthService() *HealthService {
 	return &HealthService{}
 }
 
-func (s *HealthService) HealthCheck(ctx context.Context, req *pb.HealthRequest) (*pb.HealthReply, error) {
+func (s *HealthService) HealthCheck(_ context.Context, _ *pb.HealthRequest) (*pb.HealthReply, error) {
 	return &pb.HealthReply{
 		Status: pb.Status_UP,
 	}, nil

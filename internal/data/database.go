@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/go-kratos/kratos/v2/log"
+	"github.com/night-sword/kratos-kit/log"
 	"github.com/pkg/errors"
 
 	"github.com/night-sword/kratos-layout/internal/dao"
@@ -13,7 +13,7 @@ import (
 func NewDatabase(data *Data) *Database {
 	return &Database{
 		data:  data,
-		query: dao.New(data.db),
+		query: newDao(data.db),
 	}
 }
 
