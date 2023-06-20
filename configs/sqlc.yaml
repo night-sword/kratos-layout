@@ -15,6 +15,7 @@ packages:
     query_parameter_limit: 2
     #    emit_prepared_queries: true
     emit_interface: true
+    emit_exact_table_names: true
 
 overrides:
   - go_type: "github.com/shopspring/decimal.Decimal"

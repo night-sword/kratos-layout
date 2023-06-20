@@ -7,4 +7,5 @@ import (
 var ProviderSet = wire.NewSet(
 	NewGRPCServer,
 	NewHTTPServer,
+	NewQueueServers,
 )

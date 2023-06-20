@@ -9,6 +9,7 @@ message Bootstrap {
     Server server = 1;
     Data data = 2;
     Business business = 3;
+    Job job = 4;
 }
 
 message Server {
@@ -34,14 +35,16 @@ message Data {
     message Redis {
         string network = 1;
         string addr = 2;
-        google.protobuf.Duration read_timeout = 3;
-        google.protobuf.Duration write_timeout = 4;
+        string pwd = 3;
+        google.protobuf.Duration read_timeout = 4;
+        google.protobuf.Duration write_timeout = 5;
     }
     message Registrar {
         repeated string endpoints = 1;
     }
     message DemoGrpc {
-        string addr = 1;
+        string name = 1;
+        string addr = 2;
     }
 
     Database database = 1;
@@ -50,5 +53,21 @@ message Data {
     DemoGrpc demoGrpc = 4;
 }
 
-message Business {
+message Job {
+    message JobOption {
+        int32 maxRetry = 1;  // 设置最大重试次数
+        google.protobuf.Duration Timeout = 2; // 超时时间
+        int32 concurrency = 3; // 该任务并发度
+        google.protobuf.Duration retryDelay = 4; // 休息多长时候后重试(该项配置为非0的话，则将使用该值作为固定)
+        google.protobuf.Duration retention = 5; // 任务保留时间
+    }
+
+    map<string, JobOption> jobs = 1;
+    JobOption defaultConfig = 2;
+
+    //    google.protobuf.Duration retention = 2; // 默认的任务保留时间
+    //    int32 concurrency = 3; // 默认任务并发度
+    //    google.protobuf.Duration retryDelay = 4; // 默认休息多长时候后重试
 }
+
+message Business {}

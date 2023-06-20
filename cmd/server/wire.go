@@ -20,11 +20,11 @@ import (
 func wireApp(
 	cmd.Name, cmd.Version,
 	log.Logger, config.Config,
-	*conf.Bootstrap, *conf.Server, *conf.Data, *conf.Business,
+	*conf.Bootstrap, *conf.Server, *conf.Data, *conf.Business, *conf.Job,
 ) (*kratos.App, func(), error) {
 	panic(
 		wire.Build(
-			// data.ProviderSet, biz.ProviderSet,
+			// data.ProviderSet, biz.ProviderSet, job.ProviderSet,
 			service.ProviderSet, server.ProviderSet,
 			NewServers, cmd.NewKratos,
 		),

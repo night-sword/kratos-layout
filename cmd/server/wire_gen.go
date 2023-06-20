@@ -21,7 +21,7 @@ import (
 
 // Injectors from wire.go:
 
-func wireApp(name cmd.Name, version cmd.Version, logger log.Logger, configConfig config.Config, bootstrap *conf.Bootstrap, confServer *conf.Server, data *conf.Data, business *conf.Business) (*kratos.App, func(), error) {
+func wireApp(name cmd.Name, version cmd.Version, logger log.Logger, configConfig config.Config, bootstrap *conf.Bootstrap, confServer *conf.Server, data *conf.Data, business *conf.Business, job *conf.Job) (*kratos.App, func(), error) {
 	grpcServer := server.NewGRPCServer(confServer, logger)
 	healthService := service.NewHealthService()
 	httpServer := server.NewHTTPServer(confServer, logger, healthService)

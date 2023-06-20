@@ -31,7 +31,7 @@ func main() {
 	app, cleanup, err := wireApp(
 		name, version,
 		logger, config,
-		&bootstrap, bootstrap.Server, bootstrap.Data, bootstrap.Business,
+		&bootstrap, bootstrap.Server, bootstrap.Data, bootstrap.Business, bootstrap.Job,
 	)
 	if err != nil {
 		panic(err)

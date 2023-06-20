@@ -1,7 +1,8 @@
 GOHOSTOS:=$(shell go env GOHOSTOS)
 GOPATH:=$(shell go env GOPATH)
 VERSION=$(shell git describe --tags --always)
-NAME=layout # need modify to your projcet name, this will set as service name
+# need modify to your projcet name, this will set as service name
+NAME=layout
 
 ifeq ($(GOHOSTOS), windows)
 	#the `find.exe` is different from `find` in bash/shell.
