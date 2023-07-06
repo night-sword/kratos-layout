@@ -85,11 +85,11 @@ dao:
 #######  build & run  #######
 .PHONY: run
 run: 
-	kratos run
+	kratos run -w .
 
-.PHONY: brun # build&run
+.PHONY: grun # build&run
 brun: all
-	kratos run
+	kratos run -w .
 
 .PHONY: build
 build:
