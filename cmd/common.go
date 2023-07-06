@@ -14,6 +14,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport"
+	klog "github.com/night-sword/kratos-kit/log"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	_ "go.uber.org/automaxprocs"
 
@@ -76,32 +77,20 @@ func registrar(bootstrap *conf.Bootstrap) registry.Registrar {
 	return etcd.New(client)
 }
 
-func Logger(version Version) log.Logger {
-	options := []any{
-		"ts", log.Timestamp("20060102-150405"),
-		"caller", log.DefaultCaller,
-		"version", version,
-		// "service.id", id,
-		// "service.name", Name,
-		// "trace.id", tracing.TraceID(),
-		// "span.id", tracing.SpanID(),
-	}
-
-	return log.With(log.NewStdLogger(os.Stdout), options...)
+func Logger(version string) log.Logger {
+	return klog.NewLogger(nil, []any{"VER", version})
 }
 
-func Config() config.Config {
-	c := config.New(
-		config.WithSource(
-			file.NewSource(flagconf),
-		),
+func Config() (cfg config.Config, cancel func()) {
+	cfg = config.New(
+		config.WithSource(file.NewSource(flagconf)),
 	)
-	// defer func() { _ = c.Close() }()
-	if err := c.Load(); err != nil {
+	cancel = func() { _ = cfg.Close() }
+
+	if err := cfg.Load(); err != nil {
 		panic(err)
 	}
-
-	return c
+	return
 }
 
 func Bootstrap(c config.Config) (bootstrap conf.Bootstrap) {
@@ -112,12 +101,12 @@ func Bootstrap(c config.Config) (bootstrap conf.Bootstrap) {
 }
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagconf, "conf", "./configs/config.yaml", "config path, eg: -conf config.yaml")
 
-	locale, err := time.LoadLocation("Asia/Shanghai")
+	location, err := time.LoadLocation("Asia/Shanghai")
 	if err != nil {
-		locale = time.FixedZone("CST", 8*3600)
+		location = time.FixedZone("CST", 8*3600)
 	}
 
-	time.Local = locale
+	time.Local = location
 }

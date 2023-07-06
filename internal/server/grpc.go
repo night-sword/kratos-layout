@@ -1,19 +1,16 @@
 package server
 
 import (
-	"github.com/go-kratos/kratos/v2/middleware/validate"
-
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
+	"github.com/night-sword/kratos-kit/log"
+	"github.com/night-sword/kratos-kit/middleware"
 
 	"github.com/night-sword/kratos-layout/internal/conf"
-	"github.com/night-sword/kratos-layout/internal/middleware"
 )
 
-func NewGRPCServer(
-	c *conf.Server, logger log.Logger,
-) *grpc.Server {
+func NewGRPCServer(c *conf.Server) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),

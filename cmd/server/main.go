@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	klog "github.com/night-sword/kratos-kit/log"
 	_ "go.uber.org/automaxprocs"
 
 	"github.com/night-sword/kratos-layout/cmd"
@@ -22,11 +22,13 @@ var (
 
 func main() {
 	flag.Parse()
-	config := cmd.Config()
+	config, cfgCleanup := cmd.Config()
 	bootstrap := cmd.Bootstrap(config)
+
 	name, version := cmd.Name(Name), cmd.Version(Version)
-	logger := cmd.Logger(version)
-	log.SetLogger(logger) // set default logger
+
+	logger := cmd.Logger(Version)
+	klog.SetLogger(logger)
 
 	app, cleanup, err := wireApp(
 		name, version,
@@ -36,10 +38,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer cleanup()
+	defer func() {
+		cfgCleanup()
+		cleanup()
+	}()
 
-	if err := app.Run(); err != nil {
-		panic(err)
+	if e := app.Run(); e != nil {
+		panic(e)
 	}
 }
 
