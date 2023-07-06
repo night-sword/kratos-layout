@@ -6,6 +6,8 @@ server:
     addr: 0.0.0.0:9000
     timeout: 1s
 data:
+  log:
+    level: info # debug info warn error
   database:
     driver: mysql
     source: root:root@tcp(127.0.0.1:3306)/test?parseTime=true&loc=Local&charset=utf8mb4

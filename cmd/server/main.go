@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
@@ -27,8 +28,9 @@ func main() {
 
 	name, version := cmd.Name(Name), cmd.Version(Version)
 
-	logger := cmd.Logger(Version)
+	logger := cmd.Logger(Version, bootstrap.GetData().GetLog().GetLevel())
 	klog.SetLogger(logger)
+	log.SetLogger(logger)
 
 	app, cleanup, err := wireApp(
 		name, version,

@@ -77,8 +77,8 @@ func registrar(bootstrap *conf.Bootstrap) registry.Registrar {
 	return etcd.New(client)
 }
 
-func Logger(version string) log.Logger {
-	return klog.NewLogger(nil, []any{"VER", version})
+func Logger(version string, level string) log.Logger {
+	return klog.NewLogger(level, nil, []any{"VER", version})
 }
 
 func Config() (cfg config.Config, cancel func()) {
