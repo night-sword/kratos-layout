@@ -18,5 +18,5 @@ packages:
     omit_unused_structs: true
 
 overrides:
-  - go_type: "github.com/shopspring/decimal.Decimal"
+  - go_type: "*github.com/shopspring/decimal.Decimal"
     db_type: "decimal"
