@@ -1,7 +1,7 @@
 GOHOSTOS:=$(shell go env GOHOSTOS)
 GOPATH:=$(shell go env GOPATH)
 VERSION=$(shell git describe --tags --always)
-NAME=layout # need modify to your projcet name, this will set as service name
+NAME=layout # need modify to your project name, this will set as service name
 
 ifeq ($(GOHOSTOS), windows)
 	#the `find.exe` is different from `find` in bash/shell.
@@ -33,12 +33,12 @@ init:
 
 #######  generate  #######
 
-# make service f=filename
+# make newapi f=filename
 .PHONY: newapi # generate internal proto
 newapi:
 	kratos proto add api/service/v1/$(f).proto
 
-# make service f=filename
+# make newservice f=filename
 .PHONY: newservice
 newservice: api
 	kratos proto server api/service/v1/$(f).proto
@@ -65,7 +65,10 @@ api:
 gen:
 	go mod tidy
 	wire ./...
-	sed -i "" "/go:generate go run/d" cmd/*/wire_gen.go
+	# for mac sed
+	#sed -i "" "/go:generate go run/d" cmd/*/wire_gen.go
+	# for linux sed
+	sed -i "/go:generate go run/d" cmd/*/wire_gen.go
 	go generate ./...
 	go mod tidy
 

@@ -17,6 +17,15 @@ func NewDatabase(data *Data) *Database {
 	}
 }
 
+type Database struct {
+	data  *Data
+	query *dao.Queries
+}
+
+func (inst *Database) Query() (querys *dao.Queries) {
+	return inst.query
+}
+
 func (inst *Database) WithTx(ctx context.Context) (txCtx *TxContext, err error) {
 	tx, err := inst.data.db.Begin()
 	if err != nil {
