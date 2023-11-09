@@ -20,19 +20,27 @@ type Data struct {
 	db     *sql.DB
 }
 
-func NewData(config *conf.Data) (data *Data, cleanup func(), err error) {
+func NewData(cfg *conf.Data) (data *Data, cleanup func(), err error) {
+	db := newDB(cfg)
+
 	cleanup = func() {
-		// TODO: close resources
 		log.Info("closing the data resources")
+
+		if e := db.Close(); e != nil {
+			log.Error(e)
+		}
 	}
 
-	data = &Data{}
+	data = &Data{
+		config: cfg,
+		db:     db,
+	}
 
 	return
 }
 
-func newDB(conf *conf.Data) (db *sql.DB) {
-	db, err := sql.Open(conf.Database.GetDriver(), conf.Database.GetSource())
+func newDB(cfg *conf.Data) (db *sql.DB) {
+	db, err := sql.Open(cfg.GetDatabase().GetDriver(), cfg.GetDatabase().GetSource())
 	if err != nil {
 		panic(err)
 	}
