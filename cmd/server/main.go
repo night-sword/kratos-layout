@@ -32,14 +32,20 @@ func main() {
 	klog.SetLogger(logger)
 	log.SetLogger(logger)
 
+	if bootstrap.GetBusiness().GetName() != "" {
+		name = cmd.Name(bootstrap.GetBusiness().GetName())
+	}
+
 	app, cleanup, err := wireApp(
 		name, version,
 		logger, config,
 		&bootstrap, bootstrap.Server, bootstrap.Data, bootstrap.Business,
 	)
+
 	if err != nil {
 		panic(err)
 	}
+
 	defer func() {
 		cfgCleanup()
 		cleanup()

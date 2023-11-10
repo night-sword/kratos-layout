@@ -55,4 +55,5 @@ message Data {
 }
 
 message Business {
+    string name = 1; // service name; will cover the name witch config in makefile name
 }
