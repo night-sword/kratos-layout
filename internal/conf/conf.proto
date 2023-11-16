@@ -43,15 +43,16 @@ message Data {
     message Registrar {
         repeated string endpoints = 1;
     }
-    message DemoGrpc {
-        string addr = 1;
+    message Service {
+        string name = 1;
+        google.protobuf.Duration timeout = 2;
     }
 
     Log log = 1;
     Database database = 2;
     Redis redis = 3;
     Registrar registrar = 4;
-    DemoGrpc demoGrpc = 5;
+    Service demoService = 5;
 }
 
 message Business {

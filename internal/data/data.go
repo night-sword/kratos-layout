@@ -3,12 +3,13 @@ package data
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
+	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/night-sword/kratos-kit/log"
+	etcdv3 "go.etcd.io/etcd/client/v3"
 	googlegrpc "google.golang.org/grpc"
 
 	"github.com/night-sword/kratos-layout/internal/conf"
@@ -35,7 +36,6 @@ func NewData(cfg *conf.Data) (data *Data, cleanup func(), err error) {
 		config: cfg,
 		db:     db,
 	}
-
 	return
 }
 
@@ -52,20 +52,35 @@ func newDao(db *sql.DB) (querys *dao.Queries) {
 	return dao.New(db)
 }
 
-func newDemoGrpcClient(config *conf.Data_DemoGrpc) (client googlegrpc.ClientConnInterface) {
+// new etcd client
+func newEtcdClient(config *conf.Data) (client *etcdv3.Client) {
+	client, err := etcdv3.New(etcdv3.Config{
+		Endpoints: config.GetRegistrar().GetEndpoints(),
+	})
+	if err != nil {
+		panic(err)
+	}
+	return
+}
+
+// new discovery with etcd client
+func newDiscovery(client *etcdv3.Client) (discovery *etcd.Registry) {
+	return etcd.New(client)
+}
+
+func newGrpcConn(serviceCfg *conf.Data_Service, discovery *etcd.Registry) (conn googlegrpc.ClientConnInterface) {
+	endpoint := "discovery:///" + serviceCfg.GetName()
 	conn, err := grpc.DialInsecure(
 		context.Background(),
-		grpc.WithEndpoint(config.GetAddr()),
+		grpc.WithEndpoint(endpoint),
+		grpc.WithDiscovery(discovery),
 		grpc.WithMiddleware(
 			recovery.Recovery(),
 		),
+		grpc.WithTimeout(serviceCfg.GetTimeout().AsDuration()),
 	)
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(conn)
-
-	client = &googlegrpc.ClientConn{}
 	return
 }
