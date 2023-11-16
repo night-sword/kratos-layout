@@ -60,7 +60,7 @@ func (inst *Database) Commit(ctx context.Context) (err error) {
 }
 
 func (inst *Database) Dao(ctx context.Context) (querys *dao.Queries) {
-	txCtx, ok := ctx.(TxContext)
+	txCtx, ok := ctx.(*TxContext)
 	if !ok {
 		return inst.query
 	}
