@@ -14,6 +14,8 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
+	"github.com/go-kratos/kratos/v2/transport/http"
 	klog "github.com/night-sword/kratos-kit/log"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	_ "go.uber.org/automaxprocs"
@@ -45,16 +47,26 @@ func (inst *Servers) Gets() []transport.Server {
 }
 
 func NewKratos(name Name, version Version, logger log.Logger, servers *Servers, bootstrap *conf.Bootstrap) *kratos.App {
-	return kratos.New(
+	opts := []kratos.Option{
 		kratos.ID(id(bootstrap)),
 		kratos.Name(string(name)),
 		kratos.Version(string(version)),
 		kratos.Metadata(map[string]string{}),
 		kratos.Logger(logger),
 		kratos.Server(servers.Gets()...),
+	}
 
-		// kratos.Registrar(registrar(bootstrap)),
-	)
+	// only grpc or http server registrar
+	for _, server := range servers.Gets() {
+		switch server.(type) {
+		case *grpc.Server, *http.Server:
+			opts = append(opts, kratos.Registrar(registrar(bootstrap)))
+		default:
+			continue
+		}
+	}
+
+	return kratos.New(opts...)
 }
 
 func id(bootstrap *conf.Bootstrap) string {
