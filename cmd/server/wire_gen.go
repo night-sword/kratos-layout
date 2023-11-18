@@ -7,9 +7,7 @@ package main
 
 import (
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/config"
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/night-sword/kratos-layout/cmd"
+	"github.com/night-sword/kratos-layout/cmd/internal"
 	"github.com/night-sword/kratos-layout/internal/conf"
 	"github.com/night-sword/kratos-layout/internal/server"
 	"github.com/night-sword/kratos-layout/internal/service"
@@ -21,12 +19,12 @@ import (
 
 // Injectors from wire.go:
 
-func wireApp(name cmd.Name, version cmd.Version, logger log.Logger, configConfig config.Config, bootstrap *conf.Bootstrap, confServer *conf.Server, data *conf.Data, business *conf.Business) (*kratos.App, func(), error) {
+func wireApp(arg []kratos.Option, bootstrap *conf.Bootstrap, confServer *conf.Server, data *conf.Data, business *conf.Business) (*kratos.App, func(), error) {
 	grpcServer := server.NewGRPCServer(confServer)
 	healthService := service.NewHealthService()
 	httpServer := server.NewHTTPServer(confServer, healthService)
-	servers := NewServers(grpcServer, httpServer)
-	app := cmd.NewKratos(name, version, logger, servers, bootstrap)
+	servers := newServers(grpcServer, httpServer)
+	app := internal.NewKratos(arg, servers, bootstrap)
 	return app, func() {
 	}, nil
 }

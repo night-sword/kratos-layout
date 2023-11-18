@@ -30,6 +30,10 @@ message Data {
     message Log {
         string level = 1;
     }
+    message TimeZone {
+        string location = 1;
+        int32 offset = 2;
+    }
     message Database {
         string driver = 1;
         string source = 2;
@@ -49,10 +53,11 @@ message Data {
     }
 
     Log log = 1;
-    Database database = 2;
-    Redis redis = 3;
-    Registrar registrar = 4;
-    Service demoService = 5;
+    TimeZone timezone = 2;
+    Database database = 3;
+    Redis redis = 4;
+    Registrar registrar = 5;
+    Service demoService = 6;
 }
 
 message Business {

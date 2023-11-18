@@ -109,7 +109,7 @@ release:
 #######  tools  #######
 .PHONY: grpcclient # generate all
 grpcclient:
-	grpcui -plaintext localhost:9200
+	grpcui -plaintext localhost:9000
 
 .PHONY: monitor
 monitor:
