@@ -15,9 +15,7 @@ import (
 	"github.com/night-sword/kratos-layout/internal/service"
 )
 
-func wireApp(
-	[]kratos.Option, *conf.Bootstrap, *conf.Server, *conf.Data, *conf.Business,
-) (*kratos.App, func(), error) {
+func wireApp([]kratos.Option, *conf.Bootstrap, *conf.Server, *conf.Data, *conf.Business) (*kratos.App, func(), error) {
 	panic(
 		wire.Build(
 			// data.ProviderSet, biz.ProviderSet,
