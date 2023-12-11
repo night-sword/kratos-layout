@@ -41,8 +41,10 @@ message Data {
     message Redis {
         string network = 1;
         string addr = 2;
-        google.protobuf.Duration read_timeout = 3;
-        google.protobuf.Duration write_timeout = 4;
+        string pwd = 3;
+        bool tls = 4;
+        google.protobuf.Duration read_timeout = 5;
+        google.protobuf.Duration write_timeout = 6;
     }
     message Registrar {
         repeated string endpoints = 1;

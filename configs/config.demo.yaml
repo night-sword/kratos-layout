@@ -17,10 +17,12 @@ data:
     source: root:root@tcp(127.0.0.1:3306)/test?parseTime=true&loc=Local&charset=utf8mb4
   redis:
     addr: 127.0.0.1:6379
+    pwd:
+    tls: false
     read_timeout: 0.2s
     write_timeout: 0.2s
   registrar:
-    #endpoints: [ "127.0.0.1:2379" ] # with etcd
+    # endpoints: [ "127.0.0.1:2379" ] # with etcd
 
 business:
   name: demo

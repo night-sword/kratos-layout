@@ -2,13 +2,16 @@ package data
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql"
+	"fmt"
 
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/night-sword/kratos-kit/log"
+	"github.com/redis/go-redis/v9"
 	etcdv3 "go.etcd.io/etcd/client/v3"
 	googlegrpc "google.golang.org/grpc"
 
@@ -18,10 +21,11 @@ import (
 
 type Data struct {
 	config *conf.Data
+	bizCfg *conf.Business
 	db     *sql.DB
 }
 
-func NewData(cfg *conf.Data) (data *Data, cleanup func(), err error) {
+func NewData(cfg *conf.Data, bizCfg *conf.Business) (data *Data, cleanup func(), err error) {
 	db := newDB(cfg)
 
 	cleanup = func() {
@@ -34,9 +38,14 @@ func NewData(cfg *conf.Data) (data *Data, cleanup func(), err error) {
 
 	data = &Data{
 		config: cfg,
+		bizCfg: bizCfg,
 		db:     db,
 	}
 	return
+}
+
+func (inst *Data) cacheKey(key string) string {
+	return fmt.Sprintf("%s:%s", inst.bizCfg.GetName(), key)
 }
 
 func newDB(cfg *conf.Data) (db *sql.DB) {
@@ -83,4 +92,19 @@ func newGrpcConn(serviceCfg *conf.Data_Service, discovery *etcd.Registry) (conn 
 		panic(err)
 	}
 	return
+}
+
+func newRedis(conf *conf.Data) (cache *redis.Client) {
+	opts := &redis.Options{
+		Addr:     conf.GetRedis().GetAddr(),
+		Password: conf.GetRedis().GetPwd(),
+	}
+
+	if conf.GetRedis().GetTls() {
+		opts.TLSConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
+	}
+
+	return redis.NewClient(opts)
 }
