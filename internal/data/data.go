@@ -16,22 +16,27 @@ import (
 	googlegrpc "google.golang.org/grpc"
 
 	"github.com/night-sword/kratos-layout/internal/conf"
-	"github.com/night-sword/kratos-layout/internal/dao"
 )
 
 type Data struct {
 	config *conf.Data
 	bizCfg *conf.Business
-	db     *sql.DB
+
+	db    *sql.DB
+	redis *redis.Client
 }
 
 func NewData(cfg *conf.Data, bizCfg *conf.Business) (data *Data, cleanup func(), err error) {
 	db := newDB(cfg)
+	rds := newRedis(cfg)
 
 	cleanup = func() {
 		log.Info("closing the data resources")
 
 		if e := db.Close(); e != nil {
+			log.Error(e)
+		}
+		if e := rds.Close(); e != nil {
 			log.Error(e)
 		}
 	}
@@ -40,7 +45,9 @@ func NewData(cfg *conf.Data, bizCfg *conf.Business) (data *Data, cleanup func(),
 		config: cfg,
 		bizCfg: bizCfg,
 		db:     db,
+		redis:  rds,
 	}
+
 	return
 }
 
@@ -55,10 +62,6 @@ func newDB(cfg *conf.Data) (db *sql.DB) {
 	}
 
 	return
-}
-
-func newDao(db *sql.DB) (querys *dao.Queries) {
-	return dao.New(db)
 }
 
 // new etcd client

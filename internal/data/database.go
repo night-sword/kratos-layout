@@ -5,12 +5,16 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/night-sword/gokit/errs"
 	"github.com/night-sword/kratos-kit/errors"
 	"github.com/night-sword/kratos-kit/log"
 
 	"github.com/night-sword/kratos-layout/internal/dao"
 )
+
+type Database struct {
+	data  *Data
+	query *dao.Queries
+}
 
 func NewDatabase(data *Data) *Database {
 	return &Database{
@@ -19,9 +23,8 @@ func NewDatabase(data *Data) *Database {
 	}
 }
 
-type Database struct {
-	data  *Data
-	query *dao.Queries
+func newDao(db *sql.DB) (querys *dao.Queries) {
+	return dao.New(db)
 }
 
 func (inst *Database) Query() (querys *dao.Queries) {
@@ -31,7 +34,7 @@ func (inst *Database) Query() (querys *dao.Queries) {
 func (inst *Database) WithTx(ctx context.Context) (txCtx *TxContext, err error) {
 	tx, err := inst.data.db.Begin()
 	if err != nil {
-		err = errors.InternalServer(errs.RsnInternal, "begin transaction fail").WithCause(err)
+		err = errors.InternalServer(errors.RsnInternal, "begin transaction fail").WithCause(err)
 		return
 	}
 
@@ -53,7 +56,7 @@ func (inst *Database) Commit(ctx context.Context) (err error) {
 
 	tx := txCtx.GetTx()
 	if tx == nil {
-		err = errors.InternalServer(errs.RsnInternal, "context tx is nil")
+		err = errors.InternalServer(errors.RsnInternal, "context tx is nil")
 		return
 	}
 
@@ -110,7 +113,7 @@ func (inst *TxContext) GetQuerys() (queries *dao.Queries) {
 func (inst *TxContext) Rollback() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.InternalServer(errs.RsnInternal, fmt.Sprintf("%s", r))
+			err = errors.InternalServer(errors.RsnInternal, fmt.Sprintf("%s", r))
 		}
 	}()
 	return inst.tx.Rollback()
