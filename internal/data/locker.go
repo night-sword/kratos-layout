@@ -10,7 +10,7 @@ import (
 )
 
 type Locker struct {
-	locker *locker.Locker
+	*locker.Locker
 }
 
 func NewLocker(cfg *conf.Business, data *Data) *Locker {
@@ -22,6 +22,6 @@ func NewLocker(cfg *conf.Business, data *Data) *Locker {
 	locker.SetDefaultOptions(opts)
 
 	return &Locker{
-		locker: rl,
+		Locker: rl,
 	}
 }
