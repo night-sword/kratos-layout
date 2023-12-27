@@ -22,7 +22,11 @@ data:
     read_timeout: 0.2s
     write_timeout: 0.2s
   registrar:
-    # endpoints: [ "127.0.0.1:2379" ] # with etcd
+  # endpoints: [ "127.0.0.1:2379" ] # with etcd
+  mq:
+  # driver: rabbitmq
+  # source: "amqp://root:pwd@127.0.0.1:5672/"
+  # exchangeMultiLevelScore: core-multi-level-score
 
 business:
   name: demo

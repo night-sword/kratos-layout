@@ -49,6 +49,12 @@ message Data {
     message Registrar {
         repeated string endpoints = 1;
     }
+    message Mq {
+        string driver = 1;
+        string source = 2;
+
+        string exchangeDemo = 3; // demo exchange
+    }
     message Service {
         string name = 1;
         google.protobuf.Duration timeout = 2;
@@ -59,7 +65,8 @@ message Data {
     Database database = 3;
     Redis redis = 4;
     Registrar registrar = 5;
-    Service demoService = 6;
+    Mq mq = 6;
+    Service demoService = 7;
 }
 
 message Business {
