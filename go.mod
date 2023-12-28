@@ -7,7 +7,7 @@ require (
 	github.com/go-kratos/kratos/v2 v2.7.2
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/google/wire v0.5.0
-	github.com/night-sword/kratos-kit v1.1.5
+	github.com/night-sword/kratos-kit v1.1.8
 	github.com/night-sword/redis-locker v1.0.0
 	github.com/redis/go-redis/v9 v9.3.1
 	go.etcd.io/etcd/client/v3 v3.5.11
