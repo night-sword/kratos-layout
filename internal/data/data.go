@@ -19,16 +19,15 @@ import (
 )
 
 type Data struct {
-	config *conf.Data
-	bizCfg *conf.Business
+	cfg *conf.Bootstrap
 
 	db    *sql.DB
 	redis *redis.Client
 }
 
-func NewData(cfg *conf.Data, bizCfg *conf.Business) (data *Data, cleanup func(), err error) {
-	db := newDB(cfg)
-	rds := newRedis(cfg)
+func NewData(cfg *conf.Bootstrap) (data *Data, cleanup func(), err error) {
+	db := newDB(cfg.GetData())
+	rds := newRedis(cfg.GetData())
 
 	cleanup = func() {
 		log.Info("closing the data resources")
@@ -42,17 +41,16 @@ func NewData(cfg *conf.Data, bizCfg *conf.Business) (data *Data, cleanup func(),
 	}
 
 	data = &Data{
-		config: cfg,
-		bizCfg: bizCfg,
-		db:     db,
-		redis:  rds,
+		cfg:   cfg,
+		db:    db,
+		redis: rds,
 	}
 
 	return
 }
 
 func (inst *Data) cacheKey(key string) string {
-	return fmt.Sprintf("%s:%s", inst.bizCfg.GetName(), key)
+	return fmt.Sprintf("%s:%s", inst.cfg.GetBusiness().GetName(), key)
 }
 
 func newDB(cfg *conf.Data) (db *sql.DB) {

@@ -11,10 +11,10 @@ type Cache struct {
 	prefix string
 }
 
-func NewCache(cfg *conf.Business, data *Data) *Cache {
+func NewCache(cfg *conf.Bootstrap, data *Data) *Cache {
 	return &Cache{
 		Client: data.redis,
-		prefix: cfg.GetName(),
+		prefix: cfg.GetBusiness().GetName(),
 	}
 }
 

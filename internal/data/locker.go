@@ -13,12 +13,12 @@ type Locker struct {
 	*locker.Locker
 }
 
-func NewLocker(cfg *conf.Business, data *Data) *Locker {
+func NewLocker(cfg *conf.Bootstrap, data *Data) *Locker {
 	rl := locker.NewLocker(data.redis)
 
 	opts := locker.GetDefaultOptions()
 	opts.Logger = log.NewHelper(klog.GetLogger())
-	opts.Prefix = cfg.GetName()
+	opts.Prefix = cfg.GetBusiness().GetName()
 	locker.SetDefaultOptions(opts)
 
 	return &Locker{

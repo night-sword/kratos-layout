@@ -10,7 +10,8 @@ import (
 	"github.com/night-sword/kratos-layout/internal/conf"
 )
 
-func NewGRPCServer(c *conf.Server) *grpc.Server {
+func NewGRPCServer(cfg *conf.Bootstrap) *grpc.Server {
+	c := cfg.GetServer()
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),

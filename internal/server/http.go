@@ -12,7 +12,8 @@ import (
 	"github.com/night-sword/kratos-layout/internal/service"
 )
 
-func NewHTTPServer(c *conf.Server, health *service.HealthService) *http.Server {
+func NewHTTPServer(cfg *conf.Bootstrap, health *service.Health) *http.Server {
+	c := cfg.GetServer()
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),

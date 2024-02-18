@@ -19,10 +19,10 @@ import (
 
 // Injectors from wire.go:
 
-func wireApp(arg []kratos.Option, bootstrap *conf.Bootstrap, confServer *conf.Server, data *conf.Data) (*kratos.App, func(), error) {
-	grpcServer := server.NewGRPCServer(confServer)
-	healthService := service.NewHealthService()
-	httpServer := server.NewHTTPServer(confServer, healthService)
+func wireApp(arg []kratos.Option, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
+	grpcServer := server.NewGRPCServer(bootstrap)
+	health := service.NewHealth()
+	httpServer := server.NewHTTPServer(bootstrap, health)
 	servers := newServers(grpcServer, httpServer)
 	app := internal.NewKratos(arg, servers, bootstrap)
 	return app, func() {

@@ -9,7 +9,7 @@ import (
 	"github.com/night-sword/kratos-layout/internal/conf"
 )
 
-type WireApp func(arg []kratos.Option, bootstrap *conf.Bootstrap, confServer *conf.Server, confData *conf.Data) (*kratos.App, func(), error)
+type WireApp func(arg []kratos.Option, bootstrap *conf.Bootstrap) (*kratos.App, func(), error)
 
 func Run(name *string, version string, wireApp WireApp) {
 	flag.Parse()
@@ -28,7 +28,7 @@ func Run(name *string, version string, wireApp WireApp) {
 		kratos.Logger(logger),
 	}
 
-	app, cleanup, err := wireApp(opts, bootstrap, bootstrap.GetServer(), bootstrap.GetData())
+	app, cleanup, err := wireApp(opts, bootstrap)
 	if err != nil {
 		panic(err)
 	}
