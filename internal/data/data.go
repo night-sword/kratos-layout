@@ -53,12 +53,15 @@ func (inst *Data) cacheKey(key string) string {
 	return fmt.Sprintf("%s:%s", inst.cfg.GetBusiness().GetName(), key)
 }
 
-func newDB(cfg *conf.Data) (db *sql.DB) {
-	db, err := sql.Open(cfg.GetDatabase().GetDriver(), cfg.GetDatabase().GetSource())
+func newDB(config *conf.Data) (db *sql.DB) {
+	if config.GetDatabase().GetSource() == "" {
+		panic("database source not config, if do not need db, pls remove this fn call")
+	}
+
+	db, err := sql.Open(config.GetDatabase().GetDriver(), config.GetDatabase().GetSource())
 	if err != nil {
 		panic(err)
 	}
-
 	return
 }
 
@@ -95,13 +98,17 @@ func newGrpcConn(serviceCfg *conf.Data_Service, discovery *etcd.Registry) (conn 
 	return
 }
 
-func newRedis(conf *conf.Data) (cache *redis.Client) {
-	opts := &redis.Options{
-		Addr:     conf.GetRedis().GetAddr(),
-		Password: conf.GetRedis().GetPwd(),
+func newRedis(config *conf.Data) (cache *redis.Client) {
+	if config.GetRedis().GetAddr() == "" {
+		panic("redis addr not config, if do not need redis, pls remove this fn call")
 	}
 
-	if conf.GetRedis().GetTls() {
+	opts := &redis.Options{
+		Addr:     config.GetRedis().GetAddr(),
+		Password: config.GetRedis().GetPwd(),
+	}
+
+	if config.GetRedis().GetTls() {
 		opts.TLSConfig = &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		}
