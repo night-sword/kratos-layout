@@ -2,7 +2,6 @@ package data
 
 import (
 	"github.com/go-kratos/kratos/v2/log"
-	_ "github.com/go-sql-driver/mysql"
 	klog "github.com/night-sword/kratos-kit/log"
 	"github.com/night-sword/redis-locker"
 

@@ -3,22 +3,22 @@ module github.com/night-sword/kratos-layout
 go 1.21.5
 
 require (
-	github.com/go-kratos/kratos/contrib/registry/etcd/v2 v2.0.0-20240214090454-9106991c0931
+	github.com/avast/retry-go/v4 v4.5.1
+	github.com/go-kratos/kratos/contrib/registry/etcd/v2 v2.0.0-20240301031206-50cad79c96ae
 	github.com/go-kratos/kratos/v2 v2.7.2
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/google/wire v0.6.0
-	github.com/night-sword/kratos-kit v1.1.11
+	github.com/night-sword/kratos-kit v1.1.12
 	github.com/night-sword/redis-locker v1.0.0
 	github.com/redis/go-redis/v9 v9.5.1
 	go.etcd.io/etcd/client/v3 v3.5.12
 	go.uber.org/automaxprocs v1.5.3
-	google.golang.org/genproto/googleapis/api v0.0.0-20240221002015-b0ce06bbee7c
+	google.golang.org/genproto/googleapis/api v0.0.0-20240304212257-790db918fca8
 	google.golang.org/grpc v1.62.0
 	google.golang.org/protobuf v1.32.0
 )
 
 require (
-	github.com/avast/retry-go/v4 v4.5.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
@@ -40,7 +40,6 @@ require (
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	google.golang.org/genproto v0.0.0-20240213162025-012b6fc9bca9 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240213162025-012b6fc9bca9 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240228224816-df926f6c8641 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
