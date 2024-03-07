@@ -79,6 +79,8 @@ func Bootstrap() (bootstrap *conf.Bootstrap, cleanup func()) {
 }
 
 func Logger(version string, level string) (logger log.Logger) {
+	log.DefaultMessageKey = klog.KeyMessage
+
 	logger = klog.NewLogger(level, nil, []any{"VER", version})
 	klog.SetLogger(logger)
 	log.SetLogger(logger)
