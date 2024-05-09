@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0
-	github.com/go-kratos/kratos/contrib/registry/etcd/v2 v2.0.0-20240422034133-b3b2a3474a2a
+	github.com/go-kratos/kratos/contrib/registry/etcd/v2 v2.0.0-20240504101732-d0d5761f9ca8
 	github.com/go-kratos/kratos/v2 v2.7.3
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/wire v0.6.0
@@ -13,9 +13,9 @@ require (
 	github.com/redis/go-redis/v9 v9.5.1
 	go.etcd.io/etcd/client/v3 v3.5.13
 	go.uber.org/automaxprocs v1.5.3
-	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be
+	google.golang.org/genproto/googleapis/api v0.0.0-20240506185236-b8a5c65736ae
 	google.golang.org/grpc v1.63.2
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/protobuf v1.34.1
 )
 
 require (
@@ -41,6 +41,6 @@ require (
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415141817-7cd4c1c1f9ec // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240429193739-8cf5692501f6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
