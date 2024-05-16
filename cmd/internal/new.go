@@ -14,6 +14,7 @@ import (
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	kcnst "github.com/night-sword/kratos-kit/cnst"
 	klog "github.com/night-sword/kratos-kit/log"
 	etcdv3 "go.etcd.io/etcd/client/v3"
 	_ "go.uber.org/automaxprocs"
@@ -80,7 +81,7 @@ func Bootstrap() (bootstrap *conf.Bootstrap, cleanup func()) {
 
 func Logger(version string, level string) (logger log.Logger) {
 	logger = klog.NewLogger(level, nil, []any{"VER", version})
-	log.DefaultMessageKey = klog.KeyMessage
+	log.DefaultMessageKey = kcnst.LogKeyMessage
 
 	klog.SetLogger(logger)
 	log.SetLogger(logger)
