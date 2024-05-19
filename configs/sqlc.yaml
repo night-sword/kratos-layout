@@ -20,7 +20,7 @@ packages:
 overrides:
   - go_type: "*github.com/shopspring/decimal.Decimal"
     db_type: "decimal"
-  - db_type: "json"
+  - db_type: "json" # https://github.com/sqlc-dev/sqlc/issues/129
     go_type:
       type: "[]byte"  # workaround sqlc bug when reading null json columns
     nullable: true
