@@ -26,8 +26,8 @@ type Data struct {
 }
 
 func NewData(cfg *conf.Bootstrap) (data *Data, cleanup func(), err error) {
-	db := newDB(cfg.GetData())
-	rds := newRedis(cfg.GetData())
+	db := newDB(cfg.GetData().GetDatabase())
+	rds := newRedis(cfg.GetData().GetRedis())
 
 	cleanup = func() {
 		log.Info("closing the data resources")
@@ -45,7 +45,6 @@ func NewData(cfg *conf.Bootstrap) (data *Data, cleanup func(), err error) {
 		db:    db,
 		redis: rds,
 	}
-
 	return
 }
 
@@ -53,12 +52,8 @@ func (inst *Data) cacheKey(key string) string {
 	return fmt.Sprintf("%s:%s", inst.cfg.GetBusiness().GetName(), key)
 }
 
-func newDB(config *conf.Data) (db *sql.DB) {
-	if config.GetDatabase().GetSource() == "" {
-		panic("database source not config, if do not need db, pls remove this fn call")
-	}
-
-	db, err := sql.Open(config.GetDatabase().GetDriver(), config.GetDatabase().GetSource())
+func newDB(cfg *conf.Data_Database) (db *sql.DB) {
+	db, err := sql.Open(cfg.GetDriver(), cfg.GetSource())
 	if err != nil {
 		panic(err)
 	}
@@ -98,17 +93,13 @@ func newGrpcConn(serviceCfg *conf.Data_Service, discovery *etcd.Registry) (conn 
 	return
 }
 
-func newRedis(config *conf.Data) (cache *redis.Client) {
-	if config.GetRedis().GetAddr() == "" {
-		panic("redis addr not config, if do not need redis, pls remove this fn call")
-	}
-
+func newRedis(cfg *conf.Data_Redis) (client *redis.Client) {
 	opts := &redis.Options{
-		Addr:     config.GetRedis().GetAddr(),
-		Password: config.GetRedis().GetPwd(),
+		Addr:     cfg.GetAddr(),
+		Password: cfg.GetPwd(),
 	}
 
-	if config.GetRedis().GetTls() {
+	if cfg.GetTls() {
 		opts.TLSConfig = &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		}

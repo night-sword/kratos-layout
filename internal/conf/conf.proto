@@ -62,7 +62,7 @@ message Data {
 
     Log log = 1;
     TimeZone timezone = 2;
-    Database database = 3;
+    Database database = 3; // main database
     Redis redis = 4;
     Registrar registrar = 5;
     Mq mq = 6;

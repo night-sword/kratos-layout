@@ -12,14 +12,18 @@ import (
 )
 
 type Database struct {
-	data  *Data
+	db    *sql.DB
 	query *dao.Queries
 }
 
 func NewDatabase(data *Data) *Database {
+	return NewDatabaseWithDB(data.db)
+}
+
+func NewDatabaseWithDB(db *sql.DB) *Database {
 	return &Database{
-		data:  data,
-		query: newDao(data.db),
+		db:    db,
+		query: newDao(db),
 	}
 }
 
@@ -32,7 +36,7 @@ func (inst *Database) Query() (querys *dao.Queries) {
 }
 
 func (inst *Database) WithTx(ctx context.Context) (txCtx *TxContext, err error) {
-	tx, err := inst.data.db.Begin()
+	tx, err := inst.db.Begin()
 	if err != nil {
 		err = errors.InternalServer(errors.RsnInternal, "begin transaction fail").WithCause(err)
 		return
