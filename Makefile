@@ -41,7 +41,7 @@ newapi:
 # make newservice f=filename
 .PHONY: newservice
 newservice: api
-	kratos proto server api/$(NAME)/v1/$(f).proto
+	kratos proto server api/service/v1/$(f).proto
 
 .PHONY: config # generate internal proto
 config:
