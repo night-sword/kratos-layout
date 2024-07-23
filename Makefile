@@ -2,6 +2,7 @@ GOHOSTOS:=$(shell go env GOHOSTOS)
 GOPATH:=$(shell go env GOPATH)
 VERSION=$(shell git describe --tags --always)
 NAME=layout# need modify to your project name, this will set as service name
+PROJECT_UUID := $(shell pwd | awk -F'/' '{print $$(NF-1)"/"$$(NF)}')
 
 ifeq ($(GOHOSTOS), windows)
 	#the `find.exe` is different from `find` in bash/shell.
@@ -19,6 +20,7 @@ endif
 ifneq ("$(wildcard $(PWD)/.env)","")
 	include $(PWD)/.env
 endif
+
 
 
 .PHONY: init
@@ -66,9 +68,9 @@ gen:
 	go mod tidy
 	wire ./...
 	# for mac sed
-	#sed -i "" "/go:generate go run/d" cmd/*/wire_gen.go
+	sed -i "" "/go:generate go run/d" cmd/*/wire_gen.go
 	# for linux sed
-	sed -i "/go:generate go run/d" cmd/*/wire_gen.go
+	#sed -i "/go:generate go run/d" cmd/*/wire_gen.go
 	go generate ./...
 	go mod tidy
 
@@ -96,14 +98,16 @@ brun: all
 
 .PHONY: build
 build:
+	go mod tidy
 	mkdir -p bin/ && go build -trimpath -ldflags "-X main.Version=$(VERSION) -X main.Name=$(NAME)" -o ./bin/ ./...
 
 .PHONY: release
 release:
+	go mod tidy
 	rm -f ./release/*
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-X main.Version=$(VERSION) -X main.Name=$(NAME)" -o ./release/ ./... 
-	cp ./configs/config.yaml ./release/config.yaml
-	zip -r ./release/release-$(shell date +%s).zip ./release/
+	rm -f $(CONF_PATH)/product/$(PROJECT_UUID)/$(NAME)
+	ln -s $(PWD)/release/$(NAME) $(CONF_PATH)/product/$(PROJECT_UUID)
 
 
 #######  tools  #######
