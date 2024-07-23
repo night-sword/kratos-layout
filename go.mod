@@ -4,21 +4,22 @@ go 1.22.5
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0
-	github.com/go-kratos/kratos/contrib/registry/etcd/v2 v2.0.0-20240627104009-3198e0b83bf2
-	github.com/go-kratos/kratos/v2 v2.7.3
+	github.com/go-kratos/kratos/contrib/registry/etcd/v2 v2.0.0-20240722115754-9260862c93a8
+	github.com/go-kratos/kratos/v2 v2.8.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/wire v0.6.0
 	github.com/night-sword/kratos-kit v1.1.31
 	github.com/night-sword/redis-locker v1.0.0
-	github.com/redis/go-redis/v9 v9.5.4
-	go.etcd.io/etcd/client/v3 v3.5.14
+	github.com/redis/go-redis/v9 v9.6.0
+	go.etcd.io/etcd/client/v3 v3.5.15
 	go.uber.org/automaxprocs v1.5.3
-	google.golang.org/genproto/googleapis/api v0.0.0-20240711142825-46eb208f015d
+	google.golang.org/genproto/googleapis/api v0.0.0-20240722135656-d784300faade
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 )
 
 require (
+	dario.cat/mergo v1.0.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
@@ -32,9 +33,8 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
-	github.com/imdario/mergo v0.3.16 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.14 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.14 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.15 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.15 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
