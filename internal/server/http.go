@@ -1,6 +1,7 @@
 package server
 
 import (
+	km "github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/http"
@@ -14,13 +15,21 @@ import (
 
 func NewHTTPServer(cfg *conf.Bootstrap, health *service.Health) *http.Server {
 	c := cfg.GetServer()
-	var opts = []http.ServerOption{
-		http.Middleware(
-			recovery.Recovery(),
-			middleware.LogServer(log.GetLogger()),
-			validate.Validator(),
-		),
+	ms := []km.Middleware{
+		recovery.Recovery(),
+		middleware.LogServer(log.GetLogger()),
+		validate.Validator(),
 	}
+
+	ak, sk := cfg.GetBusiness().GetToken().GetAk(), cfg.GetBusiness().GetToken().GetSk()
+	if ak != "" && sk != "" {
+		ms = append(ms, middleware.HeaderSK(ak, sk))
+	}
+
+	var opts = []http.ServerOption{
+		http.Middleware(ms...),
+	}
+
 	if c.Http.Network != "" {
 		opts = append(opts, http.Network(c.Http.Network))
 	}

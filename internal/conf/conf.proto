@@ -71,4 +71,11 @@ message Data {
 
 message Business {
     string name = 1; // service name; will cover the name witch config in makefile name
+    AccessToken token = 2; // access-token
+
+    message AccessToken {
+        string ak = 1; // http service access ak;
+        string sk = 2; // http service access sk;
+    }
 }
+
