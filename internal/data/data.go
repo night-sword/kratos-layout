@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"database/sql"
 	"fmt"
+	"io"
 
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
@@ -25,25 +26,26 @@ type Data struct {
 	redis *redis.Client
 }
 
-func NewData(cfg *conf.Bootstrap) (data *Data, cleanup func(), err error) {
+func NewData(cfg *conf.Bootstrap) (data *Data, cleanup func()) {
 	db := newDB(cfg.GetData().GetDatabase())
-	rds := newRedis(cfg.GetData().GetRedis())
+	_redis := newRedis(cfg.GetData().GetRedis())
+
+	closer := []io.Closer{
+		db, _redis, _redis,
+	}
 
 	cleanup = func() {
-		log.Info("closing the data resources")
-
-		if e := db.Close(); e != nil {
-			log.Error(e)
+		log.Info("closing the data resources...")
+		for i := range closer {
+			log.E(closer[i].Close())
 		}
-		if e := rds.Close(); e != nil {
-			log.Error(e)
-		}
+		log.Info("finish close data resources")
 	}
 
 	data = &Data{
 		cfg:   cfg,
 		db:    db,
-		redis: rds,
+		redis: _redis,
 	}
 	return
 }
