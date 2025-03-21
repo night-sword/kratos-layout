@@ -4,13 +4,14 @@ import (
 	"context"
 	"crypto/tls"
 	"database/sql"
-	"fmt"
 	"io"
 
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/night-sword/kratos-kit/errors"
 	"github.com/night-sword/kratos-kit/log"
 	"github.com/redis/go-redis/v9"
 	etcdv3 "go.etcd.io/etcd/client/v3"
@@ -22,36 +23,50 @@ import (
 type Data struct {
 	cfg *conf.Bootstrap
 
-	db    *sql.DB
-	redis *redis.Client
+	db        *sql.DB
+	redis     *redis.Client
+	discovery registry.Discovery
 }
 
-func NewData(cfg *conf.Bootstrap) (data *Data, cleanup func()) {
+func NewData(cfg *conf.Bootstrap) (data *Data, cleanup func(), err error) {
 	db := newDB(cfg.GetData().GetDatabase())
 	_redis := newRedis(cfg.GetData().GetRedis())
+	discovery, _etcd, err := newDiscovery(cfg.GetData().GetRegistrar())
+	if err != nil {
+		return
+	}
 
 	closer := []io.Closer{
-		db, _redis, _redis,
+		db, _redis, _redis, _etcd,
 	}
 
 	cleanup = func() {
 		log.Info("closing the data resources...")
 		for i := range closer {
-			log.E(closer[i].Close())
+			if closer[i] != nil {
+				log.E(closer[i].Close())
+			}
 		}
 		log.Info("finish close data resources")
 	}
 
 	data = &Data{
-		cfg:   cfg,
-		db:    db,
-		redis: _redis,
+		cfg:       cfg,
+		db:        db,
+		redis:     _redis,
+		discovery: discovery,
 	}
 	return
 }
 
-func (inst *Data) cacheKey(key string) string {
-	return fmt.Sprintf("%s:%s", inst.cfg.GetBusiness().GetName(), key)
+func (inst *Data) GetDiscovery() (discovery registry.Discovery, err error) {
+	if inst.discovery == nil {
+		err = errors.InternalServer(errors.RsnInternal, "discovery not init")
+		return
+	}
+
+	discovery = inst.discovery
+	return
 }
 
 func newDB(cfg *conf.Data_Database) (db *sql.DB) {
@@ -63,21 +78,22 @@ func newDB(cfg *conf.Data_Database) (db *sql.DB) {
 }
 
 // new discovery with etcd client
-func newDiscovery(cfg *conf.Data_Registrar) (discovery *etcd.Registry, client *etcdv3.Client, err error) {
+func newDiscovery(cfg *conf.Data_Registrar) (discovery registry.Discovery, client io.Closer, err error) {
 	if len(cfg.GetEndpoints()) == 0 {
 		return
 	}
 
-	ec := etcdv3.Config{Endpoints: cfg.GetEndpoints()}
-	if client, err = etcdv3.New(ec); err != nil {
+	_etcd, err := etcdv3.New(etcdv3.Config{Endpoints: cfg.GetEndpoints()})
+	if err != nil {
 		return
 	}
+	client = _etcd
 
-	discovery = etcd.New(client)
+	discovery = etcd.New(_etcd)
 	return
 }
 
-func newGrpcConn(serviceCfg *conf.Data_Service, discovery *etcd.Registry) (conn googlegrpc.ClientConnInterface) {
+func newGrpcConn(serviceCfg *conf.Data_Service, discovery registry.Discovery) (conn googlegrpc.ClientConnInterface) {
 	endpoint := "discovery:///" + serviceCfg.GetName()
 	conn, err := grpc.DialInsecure(
 		context.Background(),
