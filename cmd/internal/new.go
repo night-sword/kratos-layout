@@ -13,7 +13,6 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
-	"github.com/go-kratos/kratos/v2/transport/http"
 	kcnst "github.com/night-sword/kratos-kit/cnst"
 	klog "github.com/night-sword/kratos-kit/log"
 	etcdv3 "go.etcd.io/etcd/client/v3"
@@ -40,7 +39,7 @@ func NewKratos(opts []kratos.Option, servers *Servers, bootstrap *conf.Bootstrap
 		// only grpc or http server registrar
 		for _, server := range servers.Gets() {
 			switch server.(type) {
-			case *grpc.Server, *http.Server:
+			case *grpc.Server:
 				options = append(options, kratos.Registrar(registrar(bootstrap)))
 			default:
 				continue

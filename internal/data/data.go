@@ -62,20 +62,19 @@ func newDB(cfg *conf.Data_Database) (db *sql.DB) {
 	return
 }
 
-// new etcd client
-func newEtcdClient(config *conf.Data) (client *etcdv3.Client) {
-	client, err := etcdv3.New(etcdv3.Config{
-		Endpoints: config.GetRegistrar().GetEndpoints(),
-	})
-	if err != nil {
-		panic(err)
-	}
-	return
-}
-
 // new discovery with etcd client
-func newDiscovery(client *etcdv3.Client) (discovery *etcd.Registry) {
-	return etcd.New(client)
+func newDiscovery(cfg *conf.Data_Registrar) (discovery *etcd.Registry, client *etcdv3.Client, err error) {
+	if len(cfg.GetEndpoints()) == 0 {
+		return
+	}
+
+	ec := etcdv3.Config{Endpoints: cfg.GetEndpoints()}
+	if client, err = etcdv3.New(ec); err != nil {
+		return
+	}
+
+	discovery = etcd.New(client)
+	return
 }
 
 func newGrpcConn(serviceCfg *conf.Data_Service, discovery *etcd.Registry) (conn googlegrpc.ClientConnInterface) {
