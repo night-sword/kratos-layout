@@ -58,6 +58,7 @@ message Data {
     message Service {
         string name = 1;
         google.protobuf.Duration timeout = 2;
+        string host = 3; // direct dail use this field
     }
 
     Log log = 1;

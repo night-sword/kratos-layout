@@ -13,6 +13,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/night-sword/kratos-kit/errors"
 	"github.com/night-sword/kratos-kit/log"
+	"github.com/night-sword/kratos-kit/middleware"
 	"github.com/redis/go-redis/v9"
 	etcdv3 "go.etcd.io/etcd/client/v3"
 	googlegrpc "google.golang.org/grpc"
@@ -29,7 +30,10 @@ type Data struct {
 }
 
 func NewData(cfg *conf.Bootstrap) (data *Data, cleanup func(), err error) {
-	db := newDB(cfg.GetData().GetDatabase())
+	db, err := newDB(cfg.GetData().GetDatabase())
+	if err != nil {
+		return
+	}
 	_redis := newRedis(cfg.GetData().GetRedis())
 	discovery, _etcd, err := newDiscovery(cfg.GetData().GetRegistrar())
 	if err != nil {
@@ -69,12 +73,8 @@ func (inst *Data) GetDiscovery() (discovery registry.Discovery, err error) {
 	return
 }
 
-func newDB(cfg *conf.Data_Database) (db *sql.DB) {
-	db, err := sql.Open(cfg.GetDriver(), cfg.GetSource())
-	if err != nil {
-		panic(err)
-	}
-	return
+func newDB(cfg *conf.Data_Database) (db *sql.DB, err error) {
+	return sql.Open(cfg.GetDriver(), cfg.GetSource())
 }
 
 // new discovery with etcd client
@@ -93,9 +93,9 @@ func newDiscovery(cfg *conf.Data_Registrar) (discovery registry.Discovery, clien
 	return
 }
 
-func newGrpcConn(serviceCfg *conf.Data_Service, discovery registry.Discovery) (conn googlegrpc.ClientConnInterface) {
+func newGrpcConn(serviceCfg *conf.Data_Service, discovery registry.Discovery) (conn googlegrpc.ClientConnInterface, err error) {
 	endpoint := "discovery:///" + serviceCfg.GetName()
-	conn, err := grpc.DialInsecure(
+	return grpc.DialInsecure(
 		context.Background(),
 		grpc.WithEndpoint(endpoint),
 		grpc.WithDiscovery(discovery),
@@ -104,10 +104,18 @@ func newGrpcConn(serviceCfg *conf.Data_Service, discovery registry.Discovery) (c
 		),
 		grpc.WithTimeout(serviceCfg.GetTimeout().AsDuration()),
 	)
-	if err != nil {
-		panic(err)
-	}
-	return
+}
+
+func newGrpcConnDirect(cfg *conf.Data_Service) (conn googlegrpc.ClientConnInterface, err error) {
+	return grpc.DialInsecure(
+		context.Background(),
+		grpc.WithEndpoint(cfg.GetHost()),
+		grpc.WithMiddleware(
+			recovery.Recovery(),
+			middleware.FormatError(),
+		),
+		grpc.WithTimeout(cfg.GetTimeout().AsDuration()),
+	)
 }
 
 func newRedis(cfg *conf.Data_Redis) (client *redis.Client) {
