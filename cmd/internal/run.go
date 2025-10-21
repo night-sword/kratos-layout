@@ -41,7 +41,7 @@ func Run(name *string, version string, wireApp WireApp) {
 }
 
 func fixTimeZone(cfg *conf.Data_TimeZone) {
-	if cfg.GetLocation() == "" || cfg.GetOffset() <= 0 {
+	if cfg.GetLocation() == "" || cfg.GetOffset() < 0 {
 		return
 	}
 

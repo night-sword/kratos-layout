@@ -1,4 +1,4 @@
-package data
+package repo
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"github.com/night-sword/kratos-kit/errors"
 	"github.com/night-sword/kratos-kit/log"
 
+	"github.com/night-sword/kratos-layout/internal/conf"
 	"github.com/night-sword/kratos-layout/internal/dao"
 )
 
@@ -16,18 +17,33 @@ type Database struct {
 	query *dao.Queries
 }
 
-func NewDatabase(data *Data) *Database {
-	return NewDatabaseWithDB(data.db)
+func NewDatabase(cfg *conf.Bootstrap) (inst *Database, cleanup func(), err error) {
+	return newDatabase(cfg.GetData().GetDatabase())
 }
 
-func NewDatabaseWithDB(db *sql.DB) *Database {
-	return &Database{
-		db:    db,
-		query: newDao(db),
+func newDatabase(cfg *conf.Data_Database) (inst *Database, cleanup func(), err error) {
+	inst = &Database{}
+
+	db, err := inst.newDB(cfg)
+	if err != nil {
+		return
 	}
+
+	query := inst.newQuery(db)
+	cleanup = func() { closeResource(db, "database") }
+
+	inst = &Database{
+		db:    db,
+		query: query,
+	}
+	return
 }
 
-func newDao(db *sql.DB) (querys *dao.Queries) {
+func (inst *Database) newDB(cfg *conf.Data_Database) (db *sql.DB, err error) {
+	return sql.Open(cfg.GetDriver(), cfg.GetSource())
+}
+
+func (inst *Database) newQuery(db *sql.DB) (querys *dao.Queries) {
 	return dao.New(db)
 }
 

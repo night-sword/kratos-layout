@@ -6,7 +6,7 @@ import (
 	"github.com/avast/retry-go/v4"
 )
 
-var DefaultRetryOpts = []retry.Option{
+var RetryOpts = []retry.Option{
 	retry.LastErrorOnly(true),
 	retry.MaxDelay(time.Second),
 	retry.Attempts(3),

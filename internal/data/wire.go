@@ -5,6 +5,8 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
-	NewData,
-	NewDatabase, NewCache, NewLocker,
+// repo.NewDatabase,
+// repo.NewRedis,
+// kit.NewCache,
+//kit.NewLocker,
 )

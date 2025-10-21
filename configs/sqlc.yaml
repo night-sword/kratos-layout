@@ -4,8 +4,8 @@ packages:
   - path: "./../internal/dao"
     name: "dao"
     engine: "mysql"
-    schema: "./../internal/sql/"
-    queries: "./../internal/sql/"
+    schema: "./../internal/sql/ddl"
+    queries: "./../internal/sql/*/"
     emit_empty_slices: true
     emit_result_struct_pointers: true
     emit_params_struct_pointers: true

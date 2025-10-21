@@ -3,19 +3,19 @@ package service
 import (
 	"context"
 
-	pb "github.com/night-sword/kratos-layout/api/service/v1"
+	v1 "github.com/night-sword/kratos-layout/api/service/v1"
 )
 
 type Health struct {
-	pb.UnimplementedHealthServer
+	v1.UnimplementedHealthServer
 }
 
 func NewHealth() *Health {
 	return &Health{}
 }
 
-func (s *Health) HealthCheck(_ context.Context, _ *pb.HealthRequest) (*pb.HealthReply, error) {
-	return &pb.HealthReply{
-		Status: pb.Status_UP,
+func (s *Health) HealthCheck(_ context.Context, _ *v1.HealthRequest) (*v1.HealthReply, error) {
+	return &v1.HealthReply{
+		Status: v1.Status_UP,
 	}, nil
 }

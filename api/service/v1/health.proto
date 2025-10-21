@@ -1,11 +1,9 @@
 syntax = "proto3";
-package api.service.v1;
+package kratos_layout.service.v1;
 
 import "google/api/annotations.proto";
 
 option go_package = "github.com/night-sword/kratos-layout/api/service/v1;v1";
-option java_multiple_files = true;
-option java_package = "api.service.v1";
 
 enum Status {
     UP = 0;

@@ -15,6 +15,7 @@ ifeq ($(GOHOSTOS), windows)
 else
 	INTERNAL_PROTO_FILES=$(shell find internal -name *.proto)
 	API_PROTO_FILES=$(shell find api -name *.proto)
+	SELF_API_PROTO_FILES=$(shell find api -name *.proto)
 endif
 
 ifneq ("$(wildcard $(PWD)/.env)","")
@@ -38,12 +39,12 @@ init:
 # make newapi f=filename
 .PHONY: newapi # generate internal proto
 newapi:
-	kratos proto add api/$(NAME)/v1/$(f).proto
+	kratos proto add api/$(NAME)/service/v1/$(f).proto
 
 # make newservice f=filename
 .PHONY: newservice
 newservice: api
-	kratos proto server api/service/v1/$(f).proto
+	kratos proto server api/$(NAME)/service/v1/$(f).proto
 
 .PHONY: config # generate internal proto
 config:
@@ -54,14 +55,16 @@ config:
 
 .PHONY: api # generate api proto & validate
 api:
-	protoc --proto_path=./api \
+	protoc --proto_path=./api/ \
 	       --proto_path=./third_party \
- 	       --go_out=paths=source_relative:./api \
- 	       --go-http_out=paths=source_relative:./api \
- 	       --go-grpc_out=paths=source_relative:./api \
- 	       --validate_out=paths=source_relative,lang=go:./api \
-	       --openapi_out=fq_schema_naming=true,default_response=false:. \
+ 	       --go_out=paths=source_relative:./api/ \
+ 	       --go-http_out=paths=source_relative:./api/ \
+ 	       --go-grpc_out=paths=source_relative:./api/ \
 	       $(API_PROTO_FILES)
+	protoc --proto_path=./api/ \
+	       --proto_path=./third_party \
+	       --openapi_out=fq_schema_naming=true,default_response=false:. \
+	       $(SELF_API_PROTO_FILES)
 
 .PHONY: gen # generate
 gen:
@@ -81,8 +84,9 @@ all: config api dao gen
 .PHONY: dao
 dao:
 	. $(PWD)/.env
+	rm ./internal/dao/*.sql.go || true
 	# sql-dump scheme
-	mysqldump -h $(MYSQL_HOST) -P $(MYSQL_PORT) -u $(MYSQL_USER) -p$(MYSQL_PWD) --skip-add-drop-table --skip-comments --no-data $(MYSQL_DB_NAME) | sed 's/ AUTO_INCREMENT=[0-9]*//g' >./internal/sql/schema.sql
+	mysqldump -h $(MYSQL_HOST) -P $(MYSQL_PORT) -u $(MYSQL_USER) -p$(MYSQL_PWD) --skip-add-drop-table --skip-comments --no-data $(MYSQL_DB_NAME) | sed 's/ AUTO_INCREMENT=[0-9]*//g' >./internal/sql/ddl/$(MYSQL_DB_NAME).sql
 	sqlc generate -f ./configs/sqlc.yaml
 
 
