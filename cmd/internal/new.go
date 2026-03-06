@@ -36,13 +36,10 @@ func NewKratos(opts []kratos.Option, servers *Servers, bootstrap *conf.Bootstrap
 	options = append(options, opts...)
 
 	if len(bootstrap.GetData().GetRegistrar().GetEndpoints()) > 0 {
-		// only grpc or http server registrar
 		for _, server := range servers.Gets() {
-			switch server.(type) {
-			case *grpc.Server:
+			if _, ok := server.(*grpc.Server); ok {
 				options = append(options, kratos.Registrar(registrar(bootstrap)))
-			default:
-				continue
+				break
 			}
 		}
 	}
@@ -64,7 +61,7 @@ func Bootstrap() (bootstrap *conf.Bootstrap, cleanup func()) {
 		// only auto refresh business config
 		b := &conf.Bootstrap{}
 		if err := c.Scan(b); err != nil {
-			log.Errorw("scan fail, skip update bootstrap", err)
+			log.Errorf("scan fail, skip update bootstrap: %v", err)
 			return
 		}
 		bootstrap.Business = b.GetBusiness()
@@ -89,9 +86,12 @@ func Logger(version string, level string) (logger log.Logger) {
 
 func id(bootstrap *conf.Bootstrap) string {
 	hostname, _ := os.Hostname()
-	grpcPort := strings.Split(bootstrap.GetServer().GetGrpc().GetAddr(), ":")[1]
-
-	return fmt.Sprintf("%s:%s", hostname, grpcPort)
+	addr := bootstrap.GetServer().GetGrpc().GetAddr()
+	parts := strings.Split(addr, ":")
+	if len(parts) < 2 {
+		return fmt.Sprintf("%s:%s", hostname, addr)
+	}
+	return fmt.Sprintf("%s:%s", hostname, parts[len(parts)-1])
 }
 
 // new registrar with etcd client

@@ -1,7 +1,8 @@
 GOHOSTOS:=$(shell go env GOHOSTOS)
 GOPATH:=$(shell go env GOPATH)
 VERSION=$(shell git describe --tags --always)
-NAME=layout# need modify to your project name, this will set as service name
+# need modify to your project name, this will set as service name
+NAME=layout
 PROJECT_UUID := $(shell pwd | awk -F'/' '{print $$(NF-1)"/"$$(NF)}')
 
 ifeq ($(GOHOSTOS), windows)
@@ -12,10 +13,17 @@ ifeq ($(GOHOSTOS), windows)
 	Git_Bash=$(subst \,/,$(subst cmd\,bin\bash.exe,$(dir $(shell where git))))
 	INTERNAL_PROTO_FILES=$(shell $(Git_Bash) -c "find internal -name *.proto")
 	API_PROTO_FILES=$(shell $(Git_Bash) -c "find api -name *.proto")
+	SELF_API_PROTO_FILES=$(shell $(Git_Bash) -c "find api -name *.proto")
 else
-	INTERNAL_PROTO_FILES=$(shell find internal -name *.proto)
-	API_PROTO_FILES=$(shell find api -name *.proto)
-	SELF_API_PROTO_FILES=$(shell find api -name *.proto)
+	INTERNAL_PROTO_FILES=$(shell find internal -name '*.proto')
+	API_PROTO_FILES=$(shell find api -name '*.proto')
+	SELF_API_PROTO_FILES=$(shell find api -name '*.proto')
+endif
+
+ifeq ($(GOHOSTOS), darwin)
+	SED_INPLACE = sed -i ""
+else
+	SED_INPLACE = sed -i
 endif
 
 ifneq ("$(wildcard $(PWD)/.env)","")
@@ -70,10 +78,7 @@ api:
 gen:
 	go mod tidy
 	wire ./...
-	# for mac sed
-	sed -i "" "/go:generate go run/d" cmd/*/wire_gen.go
-	# for linux sed
-	#sed -i "/go:generate go run/d" cmd/*/wire_gen.go
+	$(SED_INPLACE) "/go:generate go run/d" cmd/*/wire_gen.go
 	go generate ./...
 	go mod tidy
 
@@ -83,8 +88,7 @@ all: config api dao gen
 
 .PHONY: dao
 dao:
-	. $(PWD)/.env
-	rm ./internal/dao/*.sql.go || true
+	rm -f ./internal/dao/*.sql.go
 	# sql-dump scheme
 	mysqldump -h $(MYSQL_HOST) -P $(MYSQL_PORT) -u $(MYSQL_USER) -p$(MYSQL_PWD) --skip-add-drop-table --skip-comments --no-data $(MYSQL_DB_NAME) | sed 's/ AUTO_INCREMENT=[0-9]*//g' >./internal/sql/ddl/$(MYSQL_DB_NAME).sql
 	sqlc generate -f ./configs/sqlc.yaml
@@ -96,7 +100,7 @@ dao:
 run: 
 	kratos run -w .
 
-.PHONY: grun # build&run
+.PHONY: brun # build&run
 brun: all
 	kratos run -w .
 
@@ -107,9 +111,10 @@ build:
 
 .PHONY: release
 release:
+	@if [ -z "$(CONF_PATH)" ]; then echo "Error: CONF_PATH is not set"; exit 1; fi
 	go mod tidy
 	rm -f ./release/*
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-X main.Version=$(VERSION) -X main.Name=$(NAME)" -o ./release/ ./... 
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-X main.Version=$(VERSION) -X main.Name=$(NAME)" -o ./release/ ./...
 	rm -f $(CONF_PATH)/product/$(PROJECT_UUID)/$(NAME)
 	ln -s $(PWD)/release/$(NAME) $(CONF_PATH)/product/$(PROJECT_UUID)
 
@@ -121,7 +126,6 @@ grpcclient:
 
 .PHONY: monitor
 monitor:
-	. $(PWD)/.env
 	open "http://127.0.0.1:8080"
 	asynqmon --redis-addr=$(REDIS_ADDR) --redis-password=$(REDIS_PWD)
 

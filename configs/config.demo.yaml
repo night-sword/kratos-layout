@@ -10,11 +10,12 @@ data:
   log:
     level: info # debug info warn error
   timezone:
+    fix: true # enable fix timezone
     location: "Asia/Shanghai"
-    offset: 8*3600
+    offset: 28800
   database:
     driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test?parseTime=true&loc=Local&charset=utf8mb4
+    source: <user>:<password>@tcp(<host>:<port>)/<db_name>?parseTime=true&loc=Local&charset=utf8mb4
   redis:
     addr: 127.0.0.1:6379
     pwd:
@@ -26,7 +27,6 @@ data:
   mq:
   # driver: rabbitmq
   # source: "amqp://root:pwd@127.0.0.1:5672/"
-  # exchangeMultiLevelScore: core-multi-level-score
 
 business:
   name: demo

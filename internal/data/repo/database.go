@@ -3,7 +3,6 @@ package repo
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/night-sword/kratos-kit/errors"
 	"github.com/night-sword/kratos-kit/log"
@@ -22,32 +21,30 @@ func NewDatabase(cfg *conf.Bootstrap) (inst *Database, cleanup func(), err error
 }
 
 func newDatabase(cfg *conf.Data_Database) (inst *Database, cleanup func(), err error) {
-	inst = &Database{}
+	if cfg == nil || cfg.GetDriver() == "" || cfg.GetSource() == "" {
+		err = errors.InternalServer(errors.RsnInternal, "database config is invalid")
+		return
+	}
 
-	db, err := inst.newDB(cfg)
+	db, err := sql.Open(cfg.GetDriver(), cfg.GetSource())
 	if err != nil {
 		return
 	}
 
-	query := inst.newQuery(db)
-	cleanup = func() { closeResource(db, "database") }
+	if err = db.Ping(); err != nil {
+		_ = db.Close()
+		return
+	}
 
+	cleanup = func() { closeResource(db, "database") }
 	inst = &Database{
 		db:    db,
-		query: query,
+		query: dao.New(db),
 	}
 	return
 }
 
-func (inst *Database) newDB(cfg *conf.Data_Database) (db *sql.DB, err error) {
-	return sql.Open(cfg.GetDriver(), cfg.GetSource())
-}
-
-func (inst *Database) newQuery(db *sql.DB) (querys *dao.Queries) {
-	return dao.New(db)
-}
-
-func (inst *Database) Query() (querys *dao.Queries) {
+func (inst *Database) Query() (queries *dao.Queries) {
 	return inst.query
 }
 
@@ -61,7 +58,7 @@ func (inst *Database) WithTx(ctx context.Context) (txCtx *TxContext, err error) 
 	txCtx = &TxContext{
 		Context: ctx,
 		tx:      tx,
-		querys:  inst.query.WithTx(tx),
+		queries: inst.query.WithTx(tx),
 	}
 
 	return
@@ -84,17 +81,17 @@ func (inst *Database) Commit(ctx context.Context) (err error) {
 	return
 }
 
-func (inst *Database) Dao(ctx context.Context) (querys *dao.Queries) {
+func (inst *Database) Dao(ctx context.Context) (queries *dao.Queries) {
 	txCtx, ok := ctx.(*TxContext)
 	if !ok {
 		return inst.query
 	}
 
-	if querys = txCtx.GetQuerys(); querys == nil {
-		querys = inst.query
+	if queries = txCtx.GetQueries(); queries == nil {
+		queries = inst.query
 	}
 
-	return querys
+	return queries
 }
 
 func (inst *Database) TxDo(ctx context.Context, fn func(ctx context.Context) error) (err error) {
@@ -118,23 +115,22 @@ func (inst *Database) TxDo(ctx context.Context, fn func(ctx context.Context) err
 type TxContext struct {
 	context.Context
 
-	tx     *sql.Tx
-	querys *dao.Queries
+	tx      *sql.Tx
+	queries *dao.Queries
 }
 
 func (inst *TxContext) GetTx() (tx *sql.Tx) {
 	return inst.tx
 }
 
-func (inst *TxContext) GetQuerys() (queries *dao.Queries) {
-	return inst.querys
+func (inst *TxContext) GetQueries() (queries *dao.Queries) {
+	return inst.queries
 }
 
-func (inst *TxContext) Rollback() (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = errors.InternalServer(errors.RsnInternal, fmt.Sprintf("%s", r))
-		}
-	}()
-	return inst.tx.Rollback()
+func (inst *TxContext) Rollback() error {
+	err := inst.tx.Rollback()
+	if err != nil && !errors.Is(err, sql.ErrTxDone) {
+		return err
+	}
+	return nil
 }

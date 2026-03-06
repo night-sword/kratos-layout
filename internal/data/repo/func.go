@@ -22,14 +22,22 @@ func closeResource(r io.Closer, name string) {
 	log.Infof("finish close %s resources", name)
 }
 
-func NewGrpcConnDirect(cfg *conf.Data_Service) (conn googlegrpc.ClientConnInterface, err error) {
-	return grpc.DialInsecure(
-		context.Background(),
+func NewGrpcConnDirect(cfg *conf.Data_Service) (conn *googlegrpc.ClientConn, cleanup func(), err error) {
+	opts := []grpc.ClientOption{
 		grpc.WithEndpoint(cfg.GetHost()),
 		grpc.WithMiddleware(
 			recovery.Recovery(),
 			middleware.FormatError(),
 		),
-		grpc.WithTimeout(cfg.GetTimeout().AsDuration()),
-	)
+	}
+	if cfg.GetTimeout() != nil {
+		opts = append(opts, grpc.WithTimeout(cfg.GetTimeout().AsDuration()))
+	}
+
+	conn, err = grpc.DialInsecure(context.Background(), opts...)
+	if err != nil {
+		return
+	}
+	cleanup = func() { closeResource(conn, "grpc-conn") }
+	return
 }

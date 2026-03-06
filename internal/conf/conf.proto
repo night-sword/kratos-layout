@@ -33,6 +33,7 @@ message Data {
     message TimeZone {
         string location = 1;
         int32 offset = 2;
+        bool fix = 3; // enable fix timezone
     }
     message Database {
         string driver = 1;
@@ -52,13 +53,11 @@ message Data {
     message Mq {
         string driver = 1;
         string source = 2;
-
-        string exchangeDemo = 3; // demo exchange
     }
     message Service {
         string name = 1;
         google.protobuf.Duration timeout = 2;
-        string host = 3; // direct dail use this field
+        string host = 3; // direct dial use this field
     }
 
     Log log = 1;
@@ -71,7 +70,7 @@ message Data {
 }
 
 message Business {
-    string name = 1; // service name; will cover the name witch config in makefile name
+    string name = 1; // service name; will cover the name which configured in makefile
     AccessToken token = 2; // access-token
 
     message AccessToken {

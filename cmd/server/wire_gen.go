@@ -13,15 +13,11 @@ import (
 	"github.com/night-sword/kratos-layout/internal/service"
 )
 
-import (
-	_ "go.uber.org/automaxprocs"
-)
-
 // Injectors from wire.go:
 
 func wireApp(arg []kratos.Option, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
-	grpcServer := server.NewGRPCServer(bootstrap)
 	health := service.NewHealth()
+	grpcServer := server.NewGRPCServer(bootstrap, health)
 	httpServer := server.NewHTTPServer(bootstrap, health)
 	servers := newServers(grpcServer, httpServer)
 	app := internal.NewKratos(arg, servers, bootstrap)

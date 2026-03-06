@@ -28,6 +28,8 @@ func (inst *LoopServer) Start(ctx context.Context) (err error) {
 }
 
 func (inst *LoopServer) Stop(_ context.Context) (err error) {
-	inst.cancel()
+	if inst.cancel != nil {
+		inst.cancel()
+	}
 	return
 }
